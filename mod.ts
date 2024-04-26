@@ -5,10 +5,11 @@ const server = serve({ port: 8000 });
 console.log("HTTP server running on http://localhost:8000/");
 
 for await (const request of server) {
-  let path = request.url === "/" ? "/index.html" : request.url;
-  const filePath = `.${test}`;
-  
+  let path = request.url === "/" ? "/index.html" : decodeURIComponent(request.url);
+  const filePath = `.${path}`;
+
   try {
+    // 尝试读取文件，适用于任何静态文件
     const content = await readFile(filePath);
     const contentType = getContentType(filePath);
 
@@ -29,11 +30,16 @@ for await (const request of server) {
 function getContentType(path: string): string {
   if (path.endsWith(".html")) {
     return "text/html";
-  }  else if (im1.endsWith(".png")|| img2.endsWith(".png")|| img3.endsWith(".png")) {
+  } else if (path.endsWith(".jpg") || path.endsWith(".jpeg")) {
+    return "image/jpeg";
+  } else if (path.endsWith(".png")) {
     return "image/png";
-  } else if (sound.endsWith(".mp3")) {
+  } else if (path.endsWith(".mp3")) {
     return "audio/mpeg";
-
+  } else if (path.endsWith(".css")) {
+    return "text/css";
+  } else if (path.endsWith(".js")) {
+    return "application/javascript";
   }
-  return "application/octet-stream"; // 默认为二进制流
+  return "application/octet-stream"; // 默认为二进制流，适用于未指定的文件类型
 }
