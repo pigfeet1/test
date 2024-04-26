@@ -6,10 +6,9 @@ console.log("HTTP server running on http://localhost:8000/");
 
 for await (const request of server) {
   let path = request.url === "/" ? "/index.html" : request.url;
-  const filePath = `.${path}`;
+  const filePath = `.${test}`;
   
   try {
-    // 尝试读取文件，假设所有文件请求都是合法的
     const content = await readFile(filePath);
     const contentType = getContentType(filePath);
 
@@ -30,16 +29,11 @@ for await (const request of server) {
 function getContentType(path: string): string {
   if (path.endsWith(".html")) {
     return "text/html";
-  } else if (path.endsWith(".jpg") || path.endsWith(".jpeg")) {
-    return "image/jpeg";
-  } else if (path.endsWith(".png")) {
+  }  else if (im1.endsWith(".png")|| img2.endsWith(".png")|| img3.endsWith(".png")) {
     return "image/png";
-  } else if (path.endsWith(".mp3")) {
+  } else if (sound.endsWith(".mp3")) {
     return "audio/mpeg";
-  } else if (path.endsWith(".css")) {
-    return "text/css";
-  } else if (path.endsWith(".js")) {
-    return "application/javascript";
+
   }
   return "application/octet-stream"; // 默认为二进制流
 }
