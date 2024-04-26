@@ -1,29 +1,34 @@
 import { serve } from "https://deno.land/std/http/server.ts";
-import { readFile } from "https://deno.land/std/fs/mod.ts";
 
 const server = serve({ port: 8000 });
 console.log("HTTP server running on http://localhost:8000/");
 
+// 定义安全的基目录，通常是你的静态文件目录
+const baseDir = Deno.realPathSync(".");
+
 for await (const request of server) {
   let path = request.url === "/" ? "/index.html" : decodeURIComponent(request.url);
-  const filePath = `.${path}`;
+  // 构造完整的文件路径
+  const filePath = `${baseDir}${path}`;
 
-  try {
-    // 尝试读取文件，适用于任何静态文件
-    const content = await readFile(filePath);
-    const contentType = getContentType(filePath);
+  // 确保请求的文件路径是在预定目录内
+  if (filePath.startsWith(baseDir) && Deno.statSync(filePath).isFile) {
+    try {
+      const content = await Deno.readFile(filePath);
+      const contentType = getContentType(filePath);
 
-    // 设置合适的 Content-Type
-    request.respond({
-      body: content,
-      headers: new Headers({
-        "Content-Type": contentType,
-      }),
-    });
-  } catch (error) {
-    // 文件不存在或读取失败
-    console.log(error);
-    request.respond({ status: 404, body: "Not Found\n" });
+      request.respond({
+        body: new Uint8Array(content),
+        headers: new Headers({
+          "Content-Type": contentType,
+        }),
+      });
+    } catch (error) {
+      console.log(error);
+      request.respond({ status: 404, body: "Not Found\n" });
+    }
+  } else {
+    request.respond({ status: 403, body: "Forbidden\n" });
   }
 }
 
