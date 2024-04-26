@@ -1,21 +1,21 @@
 import { serve } from "https://deno.land/std/http/server.ts";
+import { readFile } from "https://deno.land/std/fs/mod.ts";
 
 const server = serve({ port: 8000 });
 console.log("HTTP server running on http://localhost:8000/");
 
-// 使用 for await 迭代 server
 for await (const request of server) {
   let path = request.url === "/" ? "/index.html" : decodeURIComponent(request.url);
   const filePath = `.${path}`;
 
   try {
-    // 使用 Deno.readFile 读取文件，这里确保路径正确并且文件存在
-    const content = await Deno.readFile(filePath);
+    // 尝试读取文件，适用于任何静态文件
+    const content = await readFile(filePath);
     const contentType = getContentType(filePath);
 
     // 设置合适的 Content-Type
     request.respond({
-      body: new Uint8Array(content), // 确保内容是 Uint8Array 类型
+      body: content,
       headers: new Headers({
         "Content-Type": contentType,
       }),
