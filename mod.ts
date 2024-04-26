@@ -10,7 +10,7 @@ for await (const request of server) {
 
   try {
     // 尝试读取文件，适用于任何静态文件
-    const content = await readFile(filePath);
+    const content = await Deno.readFile(filePath);
     const contentType = getContentType(filePath);
 
     // 设置合适的 Content-Type
